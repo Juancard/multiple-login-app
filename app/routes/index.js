@@ -31,6 +31,15 @@ module.exports = function (app, passport) {
 					req.logout();
 					res.redirect('/login');
 				});
+		app.route('/signup')
+				.get(function(req, res) {
+					res.sendFile(path + '/public/signup.html');
+		    })
+				.post(passport.authenticate('local', {
+							successRedirect: '/',
+							failureRedirect: "/signup",
+							failureFlash : true // allow flash messages
+						}));
 
 		app.route('/profile')
 				.get(isLoggedIn, function (req, res) {
@@ -57,7 +66,7 @@ module.exports = function (app, passport) {
 		app.route('/auth/twitter/callback')
 				.get(passport.authenticate('twitter', {
 					successRedirect: '/',
-					failureRedirect: "/login"
+					failureRedirect: "/login",
 				}));
     app.route('/api/:id/clicks')
         .get(isLoggedIn, clickHandler.getClicks)

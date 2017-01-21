@@ -29,6 +29,10 @@ without having to constantly re-authenticate.
 */
 var session = require('express-session');
 
+var flash = require('connect-flash');
+var cookieParser = require('cookie-parser');
+var bodyParser   = require('body-parser');
+
 var app = express();
 require('dotenv').load();
 require('./app/config/passport')(passport);
@@ -71,7 +75,14 @@ the usage of session storage.
 */
 
 //http headers on console
-app.use(logger("combined"));
+app.use(logger("combined")); // probar tambien con "dev"
+
+app.use(flash()); // use connect-flash for flash messages stored in session
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+}));
 
 routes(app, passport);
 

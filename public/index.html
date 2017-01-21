@@ -4,8 +4,11 @@
 
 	<head>
 		<title>Clementine.js - The elegant and lightweight full stack JavaScript boilerplate.</title>
-		
+
 		<link href="/public/css/main.css" rel="stylesheet" type="text/css">
+		<!-- ALgun que otro bootstrap no esta de mas-->
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
 	</head>
 
 	<header>
@@ -21,7 +24,7 @@
 			<br />
 			<p class="clementine-text">Clementine.js</p>
 		</div>
-	
+
 		<div class="container">
 			<p>You have clicked the button <span id="click-nbr"></span> times.</p>
 			<br />
@@ -30,10 +33,25 @@
 				<button class="btn btn-delete">RESET</button>
 			</div>
 		</div>
-		
+		</br>
+		<footer>
+			 <div class="container">
+			    <div class="jumbotron text-center">
+			        <h3><span class="fa fa-lock"></span> Node Authentication</h3>
+
+			        <p>Login or Register with:</p>
+
+			        <a href="/login" class="btn btn-sm btn-default"><span class="fa fa-user"></span> Local Login</a>
+			        <a href="/signup" class="btn btn-sm btn-default"><span class="fa fa-user"></span> Local Signup</a>
+			    </div>
+				</div>
+		</footer>
+
 		<script type="text/javascript" src="common/ajax-functions.js"></script>
 		<script type="text/javascript" src="controllers/clickController.client.js"></script>
 		<script type="text/javascript" src="controllers/userController.client.js"></script>
 	</body>
+
+
 
 </html>
