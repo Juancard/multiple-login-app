@@ -217,7 +217,27 @@ module.exports = function (passport) {
                     throw err;
                 }
               });
+            } else{
+              // there is a user, then:
+
+              // if there is a user id already but is unactive
+              // just add our token and profile information
+              if (user.twitter.state == user.unactiveState()) {
+
+                  user.twitter.token = token;
+                  user.twitter.username = profile.username;
+                  user.twitter.displayName  = profile.displayName;
+                  user.twitter.email = (profile.emails && profile.emails[0].value) || "";
+                  user.twitter.state = user.activeState();
+
+                  user.save(function(err) {
+                      if (err) throw err;
+                      console.log("en guardando usuario reactivado")
+                      return done(null, user);
+                  });
+              }
             }
+            console.log("en donde no tengo que estar!")
             return done(null, user);
         });
       } else{
