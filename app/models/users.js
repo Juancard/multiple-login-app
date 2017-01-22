@@ -31,6 +31,13 @@ var User = new Schema({
       displayName: String,
       username: String,
   },
+  google: {
+      id: String,
+      token: String,
+      displayName: String,
+      username: String,
+      email: String
+  },
  nbrClicks: {
     clicks: Number
  }
