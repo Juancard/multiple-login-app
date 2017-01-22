@@ -267,11 +267,26 @@ module.exports = function (passport) {
 
                 // if there is an error, stop everything and return that
                 // ie an error connecting to the database
-                if (err)
-                    return done(err);
+                if (err) return done(err);
 
                 // if the user is found, then log them in
                 if (user) {
+                    console.log("\nSIII!!!!!!\n");
+                    // if there is a user id already but is unactive
+                    // just add our token and profile information
+                    if (user.facebook.state == user.unactiveState()) {
+                      console.log("\nDOBLE SIII!!!!!!\n");
+
+                        user.facebook.token = token;
+                        user.facebook.displayName  = profile.displayName;
+                        user.facebook.email = (profile.emails && profile.emails[0].value) || "";
+                        user.facebook.state = user.activeState();
+
+                        user.save(function(err) {
+                            if (err) throw err;
+                            return done(null, user);
+                        });
+                    }
                     return done(null, user); // user found, return that user
                 } else {
                     // if there is no user found with that facebook id, create them
