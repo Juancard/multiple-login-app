@@ -151,4 +151,16 @@ module.exports = function (app, passport) {
             failureRedirect : '/'
         }));
 
+		// github ---------------------------------
+
+    // send to google to do the authentication
+    app.route('/connect/github')
+			.get(passport.authorize('github',  { scope: [ 'user:email' ] }));
+
+    // the callback after google has authorized the user
+    app.route('/connect/github/callback')
+        .get(passport.authorize('github', {
+            successRedirect : '/profile',
+            failureRedirect : '/'
+        }));
 };
