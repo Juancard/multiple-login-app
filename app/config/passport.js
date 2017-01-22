@@ -139,7 +139,24 @@ module.exports = function (passport) {
                 return done(err);
             }
 
-            if (!user) {
+            if (user) {
+              if (user.github.state == user.unactiveState()) {
+
+                  user.github.token = token;
+                  user.github.username = profile.username;
+                  user.github.displayName  = profile.displayName;
+                  user.github.email = (profile.emails && profile.emails[0].value) || "";
+                  user.github.publicRepos = profile._json.public_repos;
+                  user.github.state = user.activeState();
+
+                  user.save(function(err) {
+                      if (err) throw err;
+                      return done(null, user);
+                  });
+              } else{
+                return done(null, user);
+              }
+            } else{
               var user = new User();
               user.nbrClicks.clicks = 0;
               user.github.id = profile.id;
@@ -151,12 +168,10 @@ module.exports = function (passport) {
               user.github.state = user.activeState();
 
               user.save(function (err) {
-                if (err) {
-                  throw err;
-                }
+                if (err) throw err;
+                return done(null, user);
               });
             }
-            return done(null, user);
         });
       } else {
         var user = req.user;
