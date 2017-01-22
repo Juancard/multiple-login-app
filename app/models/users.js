@@ -15,7 +15,6 @@ var User = new Schema({
     id: String,
     token: String,
     displayName: String,
-    username: String,
     email: String
   },
   github: {
@@ -23,6 +22,7 @@ var User = new Schema({
       token: String,
       displayName: String,
       username: String,
+      email: String,
       publicRepos: Number
   },
   twitter: {
@@ -30,12 +30,12 @@ var User = new Schema({
       token: String,
       displayName: String,
       username: String,
+      email: String
   },
   google: {
       id: String,
       token: String,
       displayName: String,
-      username: String,
       email: String
   },
  nbrClicks: {

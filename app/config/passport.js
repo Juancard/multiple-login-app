@@ -111,7 +111,8 @@ module.exports = function (passport) {
   passport.use(new GitHubStrategy({
     clientID: configAuth.githubAuth.clientID,
     clientSecret: configAuth.githubAuth.clientSecret,
-    callbackURL: configAuth.githubAuth.callbackURL
+    callbackURL: configAuth.githubAuth.callbackURL,
+    scope: 'user:email'
   },
   /*
   we need to implement what Passport refers to as the "verify callback."
@@ -131,7 +132,6 @@ module.exports = function (passport) {
         User.findOne({ 'github.id': profile.id }, function (err, user) {
 
             if (err) {
-                console.log("Error al recuperar usuario de github")
                 return done(err);
             }
 
@@ -142,10 +142,10 @@ module.exports = function (passport) {
               user.github.username = profile.username;
               user.github.displayName = profile.displayName;
               user.github.publicRepos = profile._json.public_repos;
+              user.github.email = profile.emails[0].value;
 
               user.save(function (err) {
                 if (err) {
-                  console.log("Error al guardar el usuario actualizado")
                   throw err;
                 }
               });
@@ -161,9 +161,11 @@ module.exports = function (passport) {
   passport.use(new TwitterStrategy({
     consumerKey: configAuth.twitterAuth.clientID,
     consumerSecret: configAuth.twitterAuth.clientSecret,
-    callbackURL: configAuth.twitterAuth.callbackURL
+    callbackURL: configAuth.twitterAuth.callbackURL,
+    passReqToCallback: true,
+    includeEmail: true
   },
-  function (token, refreshToken, profile, done) {
+  function (req, token, refreshToken, profile, done) {
     /*
     process.nextTick() is Node syntax that makes the code asynchronous.
     Node will wait until the current "tick" of the event loop completes
@@ -179,9 +181,10 @@ module.exports = function (passport) {
             if (!user){
               user = new User();
               user.nbrClicks.clicks = 0;
-              user.twitter.id = profile.id_str;
-              user.twitter.username = profile.name;
-              user.twitter.displayName = profile.screen_name;
+              user.twitter.id = profile.id;
+              user.twitter.username = profile.username;
+              user.twitter.displayName = profile.displayName;
+              user.twitter.email = profile.emails[0].value;
 
               user.save(function (err) {
                 if (err) {
@@ -202,8 +205,8 @@ module.exports = function (passport) {
       // pull in our app id and secret from our auth.js file
       clientID        : configAuth.facebookAuth.clientID,
       clientSecret    : configAuth.facebookAuth.clientSecret,
-      callbackURL     : configAuth.facebookAuth.callbackURL
-
+      callbackURL     : configAuth.facebookAuth.callbackURL,
+      profileFields: ['id', 'displayName', 'link', /*'about_me'*/, 'photos', 'emails']
   },
 
   // facebook will send back the token and profile
@@ -231,7 +234,6 @@ module.exports = function (passport) {
                   newUser.facebook.id    = profile.id; // set the users facebook id
                   newUser.facebook.token = token; // we will save the token that facebook provides to the user
                   newUser.facebook.displayName  = profile.displayName; // look at the passport user profile to see how names are returned
-                  newUser.facebook.username  = profile.name.username || "";
                   newUser.facebook.email = (profile.emails && profile.emails[0].value) || ""; // facebook can return multiple emails so we'll take the first
 
                   // save our user to the database
@@ -266,7 +268,6 @@ module.exports = function (passport) {
       // asynchronous
       process.nextTick(function() {
 
-          // find the user in the database based on their facebook id
           User.findOne({ 'google.id' : profile.id }, function(err, user) {
 
               // if there is an error, stop everything and return that
@@ -278,15 +279,13 @@ module.exports = function (passport) {
               if (user) {
                   return done(null, user); // user found, return that user
               } else {
-                  // if there is no user found with that facebook id, create them
                   var newUser            = new User();
-                  console.log(profile)
+
                   // set all of the facebook information in our user model
                   newUser.google.id    = profile.id; // set the users google id
                   newUser.google.token = token; // we will save the token that google provides to the user
                   newUser.google.displayName  = profile.displayName; // look at the passport user profile to see how names are returned
-                  newUser.google.username  = profile.name.username || "";
-                  newUser.facebook.email = (profile.emails && profile.emails[0].value) || ""; // facebook can return multiple emails so we'll take the first
+                  newUser.google.email = (profile.emails && profile.emails[0].value) || ""; // google can return multiple emails so we'll take the first
 
                   // save our user to the database
                   newUser.save(function(err) {

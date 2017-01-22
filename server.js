@@ -37,6 +37,9 @@ var app = express();
 require('dotenv').load();
 require('./app/config/passport')(passport);
 
+// Esta linea es para solucionar un warning hincha bolas
+// copio y pego de stackoverflow
+mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGO_URI);
 
 app.use('/controllers', express.static(process.cwd() + '/app/controllers'));

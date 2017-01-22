@@ -58,7 +58,7 @@ module.exports = function (app, passport) {
 				});
 
 		app.route('/auth/github')
-				.get(passport.authenticate('github'));
+				.get(passport.authenticate('github',  { scope: [ 'user:email' ] }));
 
 		app.route('/auth/github/callback')
 				.get(passport.authenticate('github', {
@@ -67,7 +67,7 @@ module.exports = function (app, passport) {
 				}));
 
 		app.route('/auth/twitter')
-				.get(passport.authenticate('twitter'));
+				.get(passport.authenticate('twitter', { scope : 'email' }));
 
 		app.route('/auth/twitter/callback')
 				.get(passport.authenticate('twitter', {
@@ -75,7 +75,7 @@ module.exports = function (app, passport) {
 					failureRedirect: "/login",
 				}));
 		app.route('/auth/facebook')
-				.get(passport.authenticate('facebook'));
+				.get(passport.authenticate('facebook', { scope : 'email' }));
 
 		app.route('/auth/facebook/callback')
 				.get(passport.authenticate('facebook', {
@@ -94,4 +94,61 @@ module.exports = function (app, passport) {
         .get(isLoggedIn, clickHandler.getClicks)
         .post(isLoggedIn, clickHandler.addClick)
         .delete(isLoggedIn, clickHandler.resetClicks);
+
+		// =============================================================================
+		// AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============
+		// =============================================================================
+/*
+	  // locally --------------------------------
+		app.route('/connect/local')
+    	.get(function(req, res) {
+        res.sendFile('connect-local.html');
+				//res.sendFile('connect-local.html', { message: req.flash('loginMessage') });
+		  })
+    	.post('/connect/local', passport.authenticate('local-signup', {
+        successRedirect : '/', // redirect to the secure profile section
+        failureRedirect : '/connect/local', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+    	}));
+
+    // facebook -------------------------------
+
+		// send to facebook to do the authentication
+		app.route('/connect/facebook')
+    	.get(passport.authorize('facebook', { scope : 'email' }));
+
+    // handle the callback after facebook has authorized the user
+		app.route('/connect/facebook/callback')
+	    .get(passport.authorize('facebook', {
+            successRedirect : '/profile',
+            failureRedirect : '/'
+        }));
+
+    // twitter --------------------------------
+
+    // send to twitter to do the authentication
+    app.route('/connect/twitter')
+			.get(passport.authorize('twitter', { scope : 'email' }));
+
+    // handle the callback after twitter has authorized the user
+    app.route('/connect/twitter/callback')
+      .get(passport.authorize('twitter', {
+            successRedirect : '/profile',
+            failureRedirect : '/'
+        }));
+
+
+    // google ---------------------------------
+
+    // send to google to do the authentication
+    app.route('/connect/google')
+			.get(passport.authorize('google', { scope : ['profile', 'email'] }));
+
+    // the callback after google has authorized the user
+    app.route('/connect/google/callback')
+        .get(passport.authorize('google', {
+            successRedirect : '/profile',
+            failureRedirect : '/'
+        }));
+*/
 };
