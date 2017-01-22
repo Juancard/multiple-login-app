@@ -257,10 +257,10 @@ module.exports = function (passport) {
             var user            = req.user; // pull the user out of the session
 
             // update the current users facebook credentials
-            newUser.facebook.id    = profile.id;
-            newUser.facebook.token = token;
-            newUser.facebook.displayName  = profile.displayName;
-            newUser.facebook.email = (profile.emails && profile.emails[0].value) || "";
+            user.facebook.id    = profile.id;
+            user.facebook.token = token;
+            user.facebook.displayName  = profile.displayName;
+            user.facebook.email = (profile.emails && profile.emails[0].value) || "";
 
             // save the user
             user.save(function(err) {
