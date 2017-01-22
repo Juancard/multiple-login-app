@@ -98,14 +98,14 @@ module.exports = function (app, passport) {
 		// =============================================================================
 		// AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============
 		// =============================================================================
-/*
+
 	  // locally --------------------------------
 		app.route('/connect/local')
     	.get(function(req, res) {
         res.sendFile('connect-local.html');
 				//res.sendFile('connect-local.html', { message: req.flash('loginMessage') });
 		  })
-    	.post('/connect/local', passport.authenticate('local-signup', {
+    	.post(passport.authenticate('local-signup', {
         successRedirect : '/', // redirect to the secure profile section
         failureRedirect : '/connect/local', // redirect back to the signup page if there is an error
         failureFlash : true // allow flash messages
@@ -150,5 +150,5 @@ module.exports = function (app, passport) {
             successRedirect : '/profile',
             failureRedirect : '/'
         }));
-*/
+
 };

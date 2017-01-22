@@ -4,24 +4,56 @@
 
 	<head>
 		<title>Clementine.js - The elegant and lightweight full stack JavaScript boilerplate.</title>
-		
+
 		<link href="/public/css/main.css" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
 	</head>
 
+
 	<body>
+
 		<div class="container">
+
+			<header>
+				<p>Welcome, <span id="display-name"></span>!</p>
+				<a class="menu" href="/">Home</a>
+				<p>|</p>
+				<a class="menu" href="/logout">Logout</a>
+			</header>
+
 			<div class="github-profile">
 				<img src="/public/img/gh-mark-32px.png" alt="github logo" />
 				<p><span>ID: </span><span id="profile-id" class="profile-value"></span></p>
 				<p><span>Username: </span><span id="profile-username" class="profile-value"></span></p>
 				<p><span>Display Name: </span><span id="display-name" class="profile-value"></span></p>
 				<p><span>Repositories: </span><span id="profile-repos" class="profile-value"></span></p>
-				<a class="menu" href="/">Home</a>
-				<p id="menu-divide">|</p>
-				<a class="menu" href="/logout">Logout</a>
+			</div>
+
+			<div class="btn-group btn-group-sm">
+				<div class="btn-group btn-group-vertical">
+					<a href="/connect/local" class="btn btn-warning"><span class="fa fa-user"></span></a>
+	        <a href="/unlink/local" class="btn btn-warning">Unlink</a>
+				</div>
+				<div class="btn-group btn-group-vertical">
+					<a href="/connect/facebook" class="btn btn-primary"><span class="fa fa-facebook"></span></a>
+					<a href="/unlink/facebook" class="btn btn-primary">Unlink</a>
+				</div>
+				<div class="btn-group btn-group-vertical">
+					<a href="/connect/twitter" class="btn btn-info"><span class="fa fa-twitter"></span></a>
+					<a href="/unlink/twitter" class="btn btn-info">Unlink</a>
+				</div>
+				<div class="btn-group btn-group-vertical">
+					<a href="/connect/github" class="btn btn-default"><span class="fa fa-github"></span></a>
+					<a href="/unlink/github" class="btn btn-default">Unlink</a>
+				</div>
+				<div class="btn-group btn-group-vertical">
+					<a href="/connect/google" class="btn btn-danger"><span class="fa fa-google-plus"></span></a>
+					<a href="/unlink/google" class="btn btn-danger">Unlink</a>
+				</div>
 			</div>
 		</div>
-		
+
 		<script type="text/javascript" src="common/ajax-functions.js"></script>
 		<script type="text/javascript" src="controllers/userController.client.js"></script>
 	</body>
