@@ -163,4 +163,20 @@ module.exports = function (app, passport) {
             successRedirect : '/profile',
             failureRedirect : '/'
         }));
+
+		app.route('/unlink/:account$')
+			.get(isLoggedIn, function(req, res){
+				var accountsAvailable = ["google", "twitter", "github", "facebook", "local"];
+				var account = req.params.account;
+				if (accountsAvailable.indexOf(account) > -1 && req.user.hasOwnProperty(account)){
+					var user = req.user;
+					user[account].state = user.unactiveState();
+					user.save(function(err){
+						if (err) throw err;
+						console.log("User has been correctly unlinked");
+						res.redirect("/");
+					});
+				}
+				res.redirect("/profile");
+			});
 };

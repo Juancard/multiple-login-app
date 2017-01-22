@@ -9,13 +9,15 @@ var User = new Schema({
   local: {
     username: String,
     email: String,
-    password: String
+    password: String,
+    state: String
   },
   facebook: {
     id: String,
     token: String,
     displayName: String,
-    email: String
+    email: String,
+    state: String
   },
   github: {
       id: String,
@@ -23,20 +25,23 @@ var User = new Schema({
       displayName: String,
       username: String,
       email: String,
-      publicRepos: Number
+      publicRepos: Number,
+      state: String
   },
   twitter: {
       id: String,
       token: String,
       displayName: String,
       username: String,
-      email: String
+      email: String,
+      state: String
   },
   google: {
       id: String,
       token: String,
       displayName: String,
-      email: String
+      email: String,
+      state: String
   },
  nbrClicks: {
     clicks: Number
@@ -52,6 +57,13 @@ User.methods.generateHash = function(password) {
 // checking if password is valid
 User.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.local.password);
+};
+
+User.methods.activeState = function(user) {
+  return "active";
+};
+User.methods.unactiveState = function(user) {
+    return "unactive";
 };
 
 module.exports = mongoose.model('User', User);

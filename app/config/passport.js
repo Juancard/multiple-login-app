@@ -67,6 +67,7 @@ module.exports = function (passport) {
                 newUser.local.username  = username;
                 newUser.local.password  = newUser.generateHash(password);
                 newUser.local.email     = req.body.email;
+                newUser.local.state     = newUser.activeState();
 
                 // save the user
                 newUser.save(function(err) {
@@ -147,6 +148,7 @@ module.exports = function (passport) {
               user.github.displayName = profile.displayName;
               user.github.publicRepos = profile._json.public_repos;
               user.github.email = profile.emails[0].value;
+              user.github.state = user.activeState();
 
               user.save(function (err) {
                 if (err) {
@@ -164,6 +166,7 @@ module.exports = function (passport) {
         user.github.displayName = profile.displayName;
         user.github.publicRepos = profile._json.public_repos;
         user.github.email = profile.emails[0].value;
+        user.github.state = user.activeState();
 
         user.save(function (err) {
           if (err) throw err;
@@ -207,6 +210,7 @@ module.exports = function (passport) {
               user.twitter.username = profile.username;
               user.twitter.displayName = profile.displayName;
               user.twitter.email = profile.emails[0].value;
+              user.twitter.state = user.activeState();
 
               user.save(function (err) {
                 if (err) {
@@ -223,6 +227,8 @@ module.exports = function (passport) {
         user.twitter.username = profile.username;
         user.twitter.displayName = profile.displayName;
         user.twitter.email = profile.emails[0].value;
+        user.twitter.state = user.activeState();
+
         user.save(function (err) {
           if (err) {
               throw err;
@@ -276,6 +282,7 @@ module.exports = function (passport) {
                     newUser.facebook.token = token; // we will save the token that facebook provides to the user
                     newUser.facebook.displayName  = profile.displayName; // look at the passport user profile to see how names are returned
                     newUser.facebook.email = (profile.emails && profile.emails[0].value) || ""; // facebook can return multiple emails so we'll take the first
+                    newUser.facebook.state = newUser.activeState();
 
                     // save our user to the database
                     newUser.save(function(err) {
@@ -298,6 +305,7 @@ module.exports = function (passport) {
             user.facebook.token = token;
             user.facebook.displayName  = profile.displayName;
             user.facebook.email = (profile.emails && profile.emails[0].value) || "";
+            user.facebook.state = user.activeState();
 
             // save the user
             user.save(function(err) {
@@ -346,6 +354,7 @@ module.exports = function (passport) {
                   newUser.google.token = token; // we will save the token that google provides to the user
                   newUser.google.displayName  = profile.displayName; // look at the passport user profile to see how names are returned
                   newUser.google.email = (profile.emails && profile.emails[0].value) || ""; // google can return multiple emails so we'll take the first
+                  newUser.google.state = newUser.activeState();
 
                   // save our user to the database
                   newUser.save(function(err) {
@@ -366,7 +375,7 @@ module.exports = function (passport) {
           user.google.token = token; // we will save the token that google provides to the user
           user.google.displayName  = profile.displayName; // look at the passport user profile to see how names are returned
           user.google.email = (profile.emails && profile.emails[0].value) || ""; // google can return multiple emails so we'll take the first
-
+          user.google.state = user.activeState();
 
           // save the user
           user.save(function(err) {
