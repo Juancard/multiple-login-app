@@ -24,18 +24,24 @@ module.exports = function (app, passport) {
 		app.route('/login')
         .get(function (req, res) {
             res.sendFile(path + '/public/login.html');
-        });
+        })
+				.post(passport.authenticate('local-login', {
+	        successRedirect : '/',
+	        failureRedirect : '/login',
+	        failureFlash : true
+    		}));
 
 		app.route('/logout')
 				.get(function (req, res) {
 					req.logout();
 					res.redirect('/login');
 				});
+
 		app.route('/signup')
 				.get(function(req, res) {
 					res.sendFile(path + '/public/signup.html');
 		    })
-				.post(passport.authenticate('local', {
+				.post(passport.authenticate('local-signup', {
 							successRedirect: '/',
 							failureRedirect: "/signup",
 							failureFlash : true // allow flash messages
@@ -48,7 +54,7 @@ module.exports = function (app, passport) {
 
 		app.route('/api/:id')
 				.get(isLoggedIn, function (req, res) {
-						res.json(req.user.github);
+					res.json(req.user);
 				});
 
 		app.route('/auth/github')
@@ -67,6 +73,14 @@ module.exports = function (app, passport) {
 				.get(passport.authenticate('twitter', {
 					successRedirect: '/',
 					failureRedirect: "/login",
+				}));
+		app.route('/auth/facebook')
+				.get(passport.authenticate('facebook'));
+
+		app.route('/auth/facebook/callback')
+				.get(passport.authenticate('facebook', {
+					successRedirect: '/',
+					failureRedirect: "/login"
 				}));
     app.route('/api/:id/clicks')
         .get(isLoggedIn, clickHandler.getClicks)

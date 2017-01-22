@@ -15,7 +15,8 @@ var User = new Schema({
     id: String,
     token: String,
     displayName: String,
-    username: String
+    username: String,
+    email: String
   },
   github: {
       id: String,

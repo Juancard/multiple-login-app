@@ -19,8 +19,18 @@ module.exports = {
         'clientID': process.env.TWITTER_KEY,
         'clientSecret': process.env.TWITTER_SECRET,
         'callbackURL': process.env.APP_URL + 'auth/twitter/callback'
+    },
+    'facebookAuth': {
+        'clientID': process.env.FACEBOOK_KEY,
+        'clientSecret': process.env.FACEBOOK_SECRET,
+        'callbackURL': process.env.APP_URL + 'auth/facebook/callback'
+    },
+    'googleAuth': {
+        'clientID': process.env.GOOGLE_KEY,
+        'clientSecret': process.env.GOOGLE_SECRET,
+        'callbackURL': process.env.APP_URL + 'auth/google/callback'
     }
 };
 //The 'callbackURL' is the URL we entered when registering our app,
-//and this is where GitHub will send information
+//and this is where GitHub/whoever will send information
 //once the user has been authenticated
