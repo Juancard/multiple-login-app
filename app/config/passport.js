@@ -202,26 +202,7 @@ module.exports = function (passport) {
             if (err) {
                 return done(err);
             }
-            if (!user){
-              user = new User();
-              user.nbrClicks.clicks = 0;
-              user.twitter.id = profile.id;
-              user.twitter.token = token;
-              user.twitter.username = profile.username;
-              user.twitter.displayName = profile.displayName;
-              user.twitter.email = profile.emails[0].value;
-              user.twitter.state = user.activeState();
-
-              user.save(function (err) {
-                if (err) {
-                    throw err;
-                }
-              });
-            } else{
-              // there is a user, then:
-
-              // if there is a user id already but is unactive
-              // just add our token and profile information
+            if (user){
               if (user.twitter.state == user.unactiveState()) {
 
                   user.twitter.token = token;
@@ -232,13 +213,26 @@ module.exports = function (passport) {
 
                   user.save(function(err) {
                       if (err) throw err;
-                      console.log("en guardando usuario reactivado")
                       return done(null, user);
                   });
+              } else{
+                return done(null, user);
               }
+            } else{
+              user = new User();
+              user.nbrClicks.clicks = 0;
+              user.twitter.id = profile.id;
+              user.twitter.token = token;
+              user.twitter.username = profile.username;
+              user.twitter.displayName = profile.displayName;
+              user.twitter.email = profile.emails[0].value;
+              user.twitter.state = user.activeState();
+
+              user.save(function (err) {
+                if (err) throw err;
+                return done(null, user);
+              });
             }
-            console.log("en donde no tengo que estar!")
-            return done(null, user);
         });
       } else{
         var user = req.user;
@@ -250,12 +244,9 @@ module.exports = function (passport) {
         user.twitter.state = user.activeState();
 
         user.save(function (err) {
-          if (err) {
-              throw err;
-          }
+          if (err) throw err;
           return done(null, user);
         });
-
       }
     });
   }));
@@ -305,8 +296,9 @@ module.exports = function (passport) {
                             if (err) throw err;
                             return done(null, user);
                         });
+                    } else{
+                      return done(null, user); // user found, return that user
                     }
-                    return done(null, user); // user found, return that user
                 } else {
                     // if there is no user found with that facebook id, create them
                     var newUser            = new User();
@@ -322,7 +314,6 @@ module.exports = function (passport) {
                     newUser.save(function(err) {
                         if (err)
                             throw err;
-
                         // if successful, return the new user
                         return done(null, newUser);
                     });
