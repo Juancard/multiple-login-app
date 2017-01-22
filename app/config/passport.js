@@ -271,11 +271,10 @@ module.exports = function (passport) {
 
                 // if the user is found, then log them in
                 if (user) {
-                    console.log("\nSIII!!!!!!\n");
+
                     // if there is a user id already but is unactive
                     // just add our token and profile information
                     if (user.facebook.state == user.unactiveState()) {
-                      console.log("\nDOBLE SIII!!!!!!\n");
 
                         user.facebook.token = token;
                         user.facebook.displayName  = profile.displayName;
@@ -361,7 +360,22 @@ module.exports = function (passport) {
 
               // if the user is found, then log them in
               if (user) {
-                  return done(null, user); // user found, return that user
+
+                // if there is a user id already but is unactive
+                // just add our token and profile information
+                if (user.google.state == user.unactiveState()) {
+
+                    user.google.token = token;
+                    user.google.displayName  = profile.displayName;
+                    user.google.email = (profile.emails && profile.emails[0].value) || "";
+                    user.google.state = user.activeState();
+
+                    user.save(function(err) {
+                        if (err) throw err;
+                        return done(null, user);
+                    });
+                }
+                return done(null, user); // user found, return that user
               } else {
                   var newUser            = new User();
 
