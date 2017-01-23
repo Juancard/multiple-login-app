@@ -87,7 +87,16 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 }));
 
-routes(app, passport);
+// Data to send to Routes files
+var appEnv = {
+  path: process.cwd(),
+  middleware: {
+    isLoggedIn: require("./middleware/isLoggedIn.js")
+  },
+  passport: passport
+}
+
+routes(app, appEnv);
 
 var port = process.env.PORT || 8080;
 app.listen(port, function () {

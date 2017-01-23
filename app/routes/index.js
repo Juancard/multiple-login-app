@@ -1,134 +1,15 @@
 'use strict';
 
-var path = process.cwd();
-var ClickHandler = require(path + '/app/controllers/clickHandler.server.js');
+// index.js:-
+// This is the default file which gets loaded when you require the routes folder.
+//Here  we export a func­tion which receives an app and appEnv objects as argu­ments.
+// These argu­ments are then passed down to the indi­vid­ual route han­dler func­tions.
 
-module.exports = function (app, passport) {
+module.exports = function (app, appEnv) {
 
-		// middleware
-		function isLoggedIn(req, res, next){
-			if (req.isAuthenticated()){
-				return next();
-			} else {
-				res.redirect("/login");
-			}
-		}
+	require("./main.js")(app, appEnv);
+	require("./auth.js")(app, appEnv);
+	require("./user.js")(app, appEnv);
+	require("./clicks.js")(app, appEnv);
 
-		var clickHandler = new ClickHandler();
-
-    app.route('/')
-        .get(isLoggedIn, function (req, res) {
-            res.sendFile(path + '/public/index.html');
-        });
-
-		app.route('/login')
-        .get(function (req, res) {
-            res.sendFile(path + '/public/login.html');
-        })
-				.post(passport.authenticate('local-login', {
-	        successRedirect : '/',
-	        failureRedirect : '/login',
-	        failureFlash : true
-    		}));
-
-		app.route('/logout')
-				.get(function (req, res) {
-					req.logout();
-					res.redirect('/login');
-				});
-
-		app.route('/signup')
-				.get(function(req, res) {
-					res.sendFile(path + '/public/signup.html');
-		    })
-				.post(passport.authenticate('local-signup', {
-							successRedirect: '/',
-							failureRedirect: "/signup",
-							failureFlash : true // allow flash messages
-						}));
-
-		app.route('/profile')
-				.get(isLoggedIn, function (req, res) {
-						res.sendFile(path + '/public/profile.html');
-				});
-
-		app.route('/api/:id')
-				.get(isLoggedIn, function (req, res) {
-					res.json(req.user);
-				});
-
-    app.route('/api/:id/clicks')
-        .get(isLoggedIn, clickHandler.getClicks)
-        .post(isLoggedIn, clickHandler.addClick)
-        .delete(isLoggedIn, clickHandler.resetClicks);
-
-		// =========================================================================
-		//	AUTHENTICATION AND AUTHORIZATION (handled together)                =====
-		// autehentication: connect not being logged in;                       =====
-		// authorization: connect being logged in (link other social accounts) =====
-		//==========================================================================
-
-		// GITHUB
-		app.route('/:action(auth|connect)/github')
-			.get(passport.authenticate('github',  { scope: [ 'user:email' ] }));
-		app.route('/auth/github/callback')
-				.get(passport.authenticate('github', {
-					successRedirect: '/',
-					failureRedirect: "/login"
-				}));
-
-		// TWITTER
-		app.route('/:action(auth|connect)/twitter')
-			.get(passport.authenticate('twitter', { scope : 'email' }));
-		app.route('/auth/twitter/callback')
-			.get(passport.authenticate('twitter', {
-					successRedirect: '/',
-					failureRedirect: "/login",
-				}))
-
-		// FACEBOOK
-		app.route('/:action(auth|connect)/facebook')
-			.get(passport.authenticate('facebook', { scope : 'email' }));
-		app.route('/auth/facebook/callback')
-				.get(passport.authenticate('facebook', {
-					successRedirect: '/',
-					failureRedirect: "/login"
-				}))
-
-		// GOOGLE
-		app.route('/:action(auth|connect)/google')
-			.get(passport.authenticate('google', { scope : ['profile', 'email'] }));
-		app.route('/auth/google/callback')
-			.get(passport.authenticate('google', {
-					successRedirect: '/',
-					failureRedirect: "/login"
-				}));
-
-		// LOCAL
-		app.route('/connect/local')
-    	.get(function(req, res) {
-        res.sendFile('connect-local.html');
-				//res.sendFile('connect-local.html', { message: req.flash('loginMessage') });
-		  })
-    	.post(passport.authenticate('local-signup', {
-        successRedirect : '/', // redirect to the secure profile section
-        failureRedirect : '/connect/local', // redirect back to the signup page if there is an error
-        failureFlash : true // allow flash messages
-    	}));
-
-		// =========================================================================
-		// UNLINKING ACCOUNTS ======================================================
-		//==========================================================================
-		
-		app.route('/unlink/:account(github|facebook|twitter|local|google)$')
-			.get(isLoggedIn, function(req, res){
-				var account = req.params.account;
-				var user = req.user;
-				user[account].state = user.unactiveState();
-				user.save(function(err){
-					if (err) throw err;
-					console.log("User has been correctly unlinked");
-					res.redirect("/profile");
-				});
-			});
 };
