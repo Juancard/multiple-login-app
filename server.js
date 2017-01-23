@@ -35,7 +35,7 @@ var bodyParser   = require('body-parser');
 
 var app = express();
 require('dotenv').load();
-require('./app/config/passport')(passport);
+require('./app/config/authentication/passport')(passport);
 
 // Esta linea es para solucionar un warning hincha bolas
 // copio y pego de stackoverflow
