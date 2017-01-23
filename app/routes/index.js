@@ -111,58 +111,21 @@ module.exports = function (app, passport) {
         failureFlash : true // allow flash messages
     	}));
 
-    // facebook -------------------------------
-
 		// send to facebook to do the authentication
 		app.route('/connect/facebook')
     	.get(passport.authorize('facebook', { scope : 'email' }));
-
-    // handle the callback after facebook has authorized the user
-		app.route('/connect/facebook/callback')
-	    .get(passport.authorize('facebook', {
-            successRedirect : '/profile',
-            failureRedirect : '/'
-        }));
-
-    // twitter --------------------------------
 
     // send to twitter to do the authentication
     app.route('/connect/twitter')
 			.get(passport.authorize('twitter', { scope : 'email' }));
 
-    // handle the callback after twitter has authorized the user
-    app.route('/connect/twitter/callback')
-      .get(passport.authorize('twitter', {
-            successRedirect : '/profile',
-            failureRedirect : '/'
-        }));
-
-
-    // google ---------------------------------
-
     // send to google to do the authentication
     app.route('/connect/google')
 			.get(passport.authorize('google', { scope : ['profile', 'email'] }));
 
-    // the callback after google has authorized the user
-    app.route('/connect/google/callback')
-        .get(passport.authorize('google', {
-            successRedirect : '/profile',
-            failureRedirect : '/'
-        }));
-
-		// github ---------------------------------
-
     // send to google to do the authentication
     app.route('/connect/github')
 			.get(passport.authorize('github',  { scope: [ 'user:email' ] }));
-
-    // the callback after google has authorized the user
-    app.route('/connect/github/callback')
-        .get(passport.authorize('github', {
-            successRedirect : '/profile',
-            failureRedirect : '/'
-        }));
 
 		app.route('/unlink/:account(github|facebook|twitter|local|google)$')
 			.get(isLoggedIn, function(req, res){
