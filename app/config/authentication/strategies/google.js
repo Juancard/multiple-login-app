@@ -4,6 +4,15 @@ var configAuth = require('../auth');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var User = require('../../../models/users');
 
+function fillUser(user, profile, token, callback){
+  newUser.google.id    = profile.id; // set the users google id
+  newUser.google.token = token; // we will save the token that google provides to the user
+  newUser.google.displayName  = profile.displayName; // look at the passport user profile to see how names are returned
+  newUser.google.email = (profile.emails && profile.emails[0].value) || ""; // google can return multiple emails so we'll take the first
+  newUser.google.state = newUser.activeState();
+  callback(null, user);
+}
+
 module.exports = function (passport) {
 
     // =========================================================================
@@ -39,34 +48,21 @@ module.exports = function (passport) {
                   // if there is a user id already but is unactive
                   // just add our token and profile information
                   if (user.google.state == user.unactiveState()) {
-
-                      user.google.token = token;
-                      user.google.displayName  = profile.displayName;
-                      user.google.email = (profile.emails && profile.emails[0].value) || "";
-                      user.google.state = user.activeState();
-
+                    fillUser(user, profile, token, function(err, user){
                       user.save(function(err) {
                           if (err) throw err;
                           return done(null, user);
                       });
+                    });
                   }
                   return done(null, user); // user found, return that user
                 } else {
                     var newUser            = new User();
-
-                    newUser.google.id    = profile.id; // set the users google id
-                    newUser.google.token = token; // we will save the token that google provides to the user
-                    newUser.google.displayName  = profile.displayName; // look at the passport user profile to see how names are returned
-                    newUser.google.email = (profile.emails && profile.emails[0].value) || ""; // google can return multiple emails so we'll take the first
-                    newUser.google.state = newUser.activeState();
-
-                    // save our user to the database
-                    newUser.save(function(err) {
-                        if (err)
-                            throw err;
-
-                        // if successful, return the new user
-                        return done(null, newUser);
+                    fillUser(user, profile, token, function(err, user){
+                      user.save(function(err) {
+                          if (err) throw err;
+                          return done(null, user);
+                      });
                     });
                 }
 
@@ -74,17 +70,11 @@ module.exports = function (passport) {
           } else {
             // user already exists and is logged in, we have to link accounts
             var user            = req.user; // pull the user out of the session
-
-            user.google.id    = profile.id; // set the users google id
-            user.google.token = token; // we will save the token that google provides to the user
-            user.google.displayName  = profile.displayName; // look at the passport user profile to see how names are returned
-            user.google.email = (profile.emails && profile.emails[0].value) || ""; // google can return multiple emails so we'll take the first
-            user.google.state = user.activeState();
-
-            // save the user
-            user.save(function(err) {
-                if (err) throw err;
-                return done(null, user);
+            fillUser(user, profile, token, function(err, user){
+              user.save(function(err) {
+                  if (err) throw err;
+                  return done(null, user);
+              });
             });
           }
         });

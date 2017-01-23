@@ -4,6 +4,17 @@ var GitHubStrategy = require('passport-github').Strategy;
 var User = require('../../../models/users');
 var configAuth = require('../auth');
 
+function fillUser(user, profile, token, callback){
+  user.github.id = profile.id;
+  user.github.token = token;
+  user.github.username = profile.username;
+  user.github.displayName = profile.displayName;
+  user.github.publicRepos = profile._json.public_repos;
+  user.github.email = profile.emails[0].value;
+  user.github.state = user.activeState();
+  callback(null, user);
+}
+
 module.exports = function (passport) {
 
   passport.use(new GitHubStrategy({
@@ -38,51 +49,33 @@ module.exports = function (passport) {
 
             if (user) {
               if (user.github.state == user.unactiveState()) {
-
-                  user.github.token = token;
-                  user.github.username = profile.username;
-                  user.github.displayName  = profile.displayName;
-                  user.github.email = (profile.emails && profile.emails[0].value) || "";
-                  user.github.publicRepos = profile._json.public_repos;
-                  user.github.state = user.activeState();
-
+                fillUser(user, profile, token, function(err, user){
                   user.save(function(err) {
                       if (err) throw err;
                       return done(null, user);
                   });
+                });
               } else{
                 return done(null, user);
               }
             } else{
               var user = new User();
               user.nbrClicks.clicks = 0;
-              user.github.id = profile.id;
-              user.github.token = token;
-              user.github.username = profile.username;
-              user.github.displayName = profile.displayName;
-              user.github.publicRepos = profile._json.public_repos;
-              user.github.email = profile.emails[0].value;
-              user.github.state = user.activeState();
-
-              user.save(function (err) {
-                if (err) throw err;
-                return done(null, user);
+              fillUser(user, profile, token, function(err, user){
+                user.save(function(err) {
+                    if (err) throw err;
+                    return done(null, user);
+                });
               });
             }
         });
       } else {
         var user = req.user;
-        user.github.id = profile.id;
-        user.github.token = token;
-        user.github.username = profile.username;
-        user.github.displayName = profile.displayName;
-        user.github.publicRepos = profile._json.public_repos;
-        user.github.email = profile.emails[0].value;
-        user.github.state = user.activeState();
-
-        user.save(function (err) {
-          if (err) throw err;
-          return done(null, user);
+        fillUser(user, profile, token, function(err, user){
+          user.save(function(err) {
+              if (err) throw err;
+              return done(null, user);
+          });
         });
       }
     });

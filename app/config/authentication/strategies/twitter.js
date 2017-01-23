@@ -4,8 +4,18 @@ var configAuth = require('../auth');
 var TwitterStrategy = require('passport-twitter').Strategy;
 var User = require('../../../models/users');
 
+function fillUser(user, profile, token, callback){
+  user.twitter.id = profile.id;
+  user.twitter.token = token;
+  user.twitter.username = profile.username;
+  user.twitter.displayName = profile.displayName;
+  user.twitter.email = profile.emails[0].value;
+  user.twitter.state = user.activeState();
+  callback(null, user);
+}
+
 module.exports = function (passport) {
-  
+
   // =========================================================================
   // TWITTER SIGNUP ============================================================
   // =========================================================================
@@ -34,48 +44,32 @@ module.exports = function (passport) {
             }
             if (user){
               if (user.twitter.state == user.unactiveState()) {
-
-                  user.twitter.token = token;
-                  user.twitter.username = profile.username;
-                  user.twitter.displayName  = profile.displayName;
-                  user.twitter.email = (profile.emails && profile.emails[0].value) || "";
-                  user.twitter.state = user.activeState();
-
+                fillUser(user, profile, token, function(err, user){
                   user.save(function(err) {
                       if (err) throw err;
                       return done(null, user);
                   });
+                });
               } else{
                 return done(null, user);
               }
             } else{
               user = new User();
-              user.nbrClicks.clicks = 0;
-              user.twitter.id = profile.id;
-              user.twitter.token = token;
-              user.twitter.username = profile.username;
-              user.twitter.displayName = profile.displayName;
-              user.twitter.email = profile.emails[0].value;
-              user.twitter.state = user.activeState();
-
-              user.save(function (err) {
-                if (err) throw err;
-                return done(null, user);
+              fillUser(user, profile, token, function(err, user){
+                user.save(function(err) {
+                    if (err) throw err;
+                    return done(null, user);
+                });
               });
             }
         });
       } else{
         var user = req.user;
-        user.twitter.id = profile.id;
-        user.twitter.token = token;
-        user.twitter.username = profile.username;
-        user.twitter.displayName = profile.displayName;
-        user.twitter.email = profile.emails[0].value;
-        user.twitter.state = user.activeState();
-
-        user.save(function (err) {
-          if (err) throw err;
-          return done(null, user);
+        fillUser(user, profile, token, function(err, user){
+          user.save(function(err) {
+              if (err) throw err;
+              return done(null, user);
+          });
         });
       }
     });

@@ -1,7 +1,17 @@
 'use strict';
+
 var configAuth = require('../auth');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var User = require('../../../models/users');
+
+function fillUser(user, profile, token, callback){
+  newUser.facebook.id    = profile.id; // set the users facebook id
+  newUser.facebook.token = token; // we will save the token that facebook provides to the user
+  newUser.facebook.displayName  = profile.displayName; // look at the passport user profile to see how names are returned
+  newUser.facebook.email = (profile.emails && profile.emails[0].value) || ""; // facebook can return multiple emails so we'll take the first
+  newUser.facebook.state = newUser.activeState();
+  callback(null, user);
+}
 
 module.exports = function (passport) {
 
@@ -40,36 +50,23 @@ module.exports = function (passport) {
                       // if there is a user id already but is unactive
                       // just add our token and profile information
                       if (user.facebook.state == user.unactiveState()) {
-
-                          user.facebook.token = token;
-                          user.facebook.displayName  = profile.displayName;
-                          user.facebook.email = (profile.emails && profile.emails[0].value) || "";
-                          user.facebook.state = user.activeState();
-
+                        fillUser(user, profile, token, function(err, user){
                           user.save(function(err) {
                               if (err) throw err;
                               return done(null, user);
                           });
+                        });
                       } else{
                         return done(null, user); // user found, return that user
                       }
                   } else {
                       // if there is no user found with that facebook id, create them
                       var newUser            = new User();
-
-                      // set all of the facebook information in our user model
-                      newUser.facebook.id    = profile.id; // set the users facebook id
-                      newUser.facebook.token = token; // we will save the token that facebook provides to the user
-                      newUser.facebook.displayName  = profile.displayName; // look at the passport user profile to see how names are returned
-                      newUser.facebook.email = (profile.emails && profile.emails[0].value) || ""; // facebook can return multiple emails so we'll take the first
-                      newUser.facebook.state = newUser.activeState();
-
-                      // save our user to the database
-                      newUser.save(function(err) {
-                          if (err)
-                              throw err;
-                          // if successful, return the new user
-                          return done(null, newUser);
+                      fillUser(user, profile, token, function(err, user){
+                        user.save(function(err) {
+                            if (err) throw err;
+                            return done(null, user);
+                        });
                       });
                   }
 
@@ -78,19 +75,12 @@ module.exports = function (passport) {
             } else {
               // user already exists and is logged in, we have to link accounts
               var user            = req.user; // pull the user out of the session
-
-              // update the current users facebook credentials
-              user.facebook.id    = profile.id;
-              user.facebook.token = token;
-              user.facebook.displayName  = profile.displayName;
-              user.facebook.email = (profile.emails && profile.emails[0].value) || "";
-              user.facebook.state = user.activeState();
-
-              // save the user
-              user.save(function(err) {
-                  if (err) throw err;
-                  return done(null, user);
-              });
+              fillUser(user, profile, token, function(err, user){
+                user.save(function(err) {
+                    if (err) throw err;
+                    return done(null, user);
+                });
+              });;
             }
 
         });
