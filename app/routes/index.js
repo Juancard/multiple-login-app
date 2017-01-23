@@ -57,49 +57,54 @@ module.exports = function (app, passport) {
 					res.json(req.user);
 				});
 
-		app.route('/auth/github')
-				.get(passport.authenticate('github',  { scope: [ 'user:email' ] }));
+    app.route('/api/:id/clicks')
+        .get(isLoggedIn, clickHandler.getClicks)
+        .post(isLoggedIn, clickHandler.addClick)
+        .delete(isLoggedIn, clickHandler.resetClicks);
 
+		// =========================================================================
+		//	AUTHENTICATION AND AUTHORIZATION (handled together)                =====
+		// autehentication: connect not being logged in;                       =====
+		// authorization: connect being logged in (link other social accounts) =====
+		//==========================================================================
+
+		// GITHUB
+		app.route('/:action(auth|connect)/github')
+			.get(passport.authenticate('github',  { scope: [ 'user:email' ] }));
 		app.route('/auth/github/callback')
 				.get(passport.authenticate('github', {
 					successRedirect: '/',
 					failureRedirect: "/login"
 				}));
 
-		app.route('/auth/twitter')
-				.get(passport.authenticate('twitter', { scope : 'email' }));
-
+		// TWITTER
+		app.route('/:action(auth|connect)/twitter')
+			.get(passport.authenticate('twitter', { scope : 'email' }));
 		app.route('/auth/twitter/callback')
-				.get(passport.authenticate('twitter', {
+			.get(passport.authenticate('twitter', {
 					successRedirect: '/',
 					failureRedirect: "/login",
-				}));
-		app.route('/auth/facebook')
-				.get(passport.authenticate('facebook', { scope : 'email' }));
+				}))
 
+		// FACEBOOK
+		app.route('/:action(auth|connect)/facebook')
+			.get(passport.authenticate('facebook', { scope : 'email' }));
 		app.route('/auth/facebook/callback')
 				.get(passport.authenticate('facebook', {
 					successRedirect: '/',
 					failureRedirect: "/login"
-				}));
-		app.route('/auth/google')
-				.get(passport.authenticate('google', { scope : ['profile', 'email'] }));
+				}))
 
+		// GOOGLE
+		app.route('/:action(auth|connect)/google')
+			.get(passport.authenticate('google', { scope : ['profile', 'email'] }));
 		app.route('/auth/google/callback')
-				.get(passport.authenticate('google', {
+			.get(passport.authenticate('google', {
 					successRedirect: '/',
 					failureRedirect: "/login"
 				}));
-    app.route('/api/:id/clicks')
-        .get(isLoggedIn, clickHandler.getClicks)
-        .post(isLoggedIn, clickHandler.addClick)
-        .delete(isLoggedIn, clickHandler.resetClicks);
 
-		// =============================================================================
-		// AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============
-		// =============================================================================
-
-	  // locally --------------------------------
+		// LOCAL
 		app.route('/connect/local')
     	.get(function(req, res) {
         res.sendFile('connect-local.html');
@@ -111,22 +116,10 @@ module.exports = function (app, passport) {
         failureFlash : true // allow flash messages
     	}));
 
-		// send to facebook to do the authentication
-		app.route('/connect/facebook')
-    	.get(passport.authorize('facebook', { scope : 'email' }));
-
-    // send to twitter to do the authentication
-    app.route('/connect/twitter')
-			.get(passport.authorize('twitter', { scope : 'email' }));
-
-    // send to google to do the authentication
-    app.route('/connect/google')
-			.get(passport.authorize('google', { scope : ['profile', 'email'] }));
-
-    // send to google to do the authentication
-    app.route('/connect/github')
-			.get(passport.authorize('github',  { scope: [ 'user:email' ] }));
-
+		// =========================================================================
+		// UNLINKING ACCOUNTS ======================================================
+		//==========================================================================
+		
 		app.route('/unlink/:account(github|facebook|twitter|local|google)$')
 			.get(isLoggedIn, function(req, res){
 				var account = req.params.account;
