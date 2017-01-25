@@ -35,41 +35,33 @@ module.exports = function (app, appEnv) {
   // authorization: connect being logged in (link other social accounts) =====
   //==========================================================================
 
+  app.route('/auth/:account(github|twitter|facebook|google)/callback')
+      .get(function(req, res, next){
+        appEnv.passport.authenticate(req.params.account, function(err, user, info){
+          if (err) return next(err);
+          if (!user) return res.redirect('/login');
+          req.logIn(user, function(err) {
+            if (err) { return next(err); }
+            return res.redirect('/api/123');
+          });
+        })(req, res, next);;
+      });
+
   // GITHUB
   app.route('/:action(auth|connect)/github')
   	.get(appEnv.passport.authenticate('github',  { scope: [ 'user:email' ] }));
-  app.route('/auth/github/callback')
-  		.get(appEnv.passport.authenticate('github', {
-  			successRedirect: '/',
-  			failureRedirect: "/login"
-  		}));
 
   // TWITTER
   app.route('/:action(auth|connect)/twitter')
   	.get(appEnv.passport.authenticate('twitter', { scope : 'email' }));
-  app.route('/auth/twitter/callback')
-  	.get(appEnv.passport.authenticate('twitter', {
-  			successRedirect: '/',
-  			failureRedirect: "/login",
-  		}))
 
   // FACEBOOK
   app.route('/:action(auth|connect)/facebook')
   	.get(appEnv.passport.authenticate('facebook', { scope : 'email' }));
-  app.route('/auth/facebook/callback')
-  		.get(appEnv.passport.authenticate('facebook', {
-  			successRedirect: '/',
-  			failureRedirect: "/login"
-  		}))
 
   // GOOGLE
   app.route('/:action(auth|connect)/google')
   	.get(appEnv.passport.authenticate('google', { scope : ['profile', 'email'] }));
-  app.route('/auth/google/callback')
-  	.get(appEnv.passport.authenticate('google', {
-  			successRedirect: '/',
-  			failureRedirect: "/login"
-  		}));
 
   // LOCAL
   app.route('/connect/local')

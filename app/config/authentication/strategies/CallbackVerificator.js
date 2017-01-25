@@ -2,7 +2,7 @@
 
 var User = require('../../../models/users');
 
-var CallbackVerificator = function(provider, credentials){
+var CallbackVerificator = function(provider){
   this.provider = provider;
 }
 
