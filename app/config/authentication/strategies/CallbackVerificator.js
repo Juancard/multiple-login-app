@@ -53,7 +53,6 @@ CallbackVerificator.prototype = {
               }
             } else{
               var user = new User();
-              user.nbrClicks.clicks = 0;
               self.fillUser(user, profile, token, function(err, user){
                 user.save(function(err) {
                     if (err) throw err;

@@ -2,6 +2,7 @@
 
 var express = require('express');
 var routes = require('./app/routes/index.js');
+var cookieParser = require('cookie-parser');
 
 // para ver headers http (agregado por mi, no viene en el clementine)
 var logger = require("morgan");
@@ -81,7 +82,7 @@ the usage of session storage.
 app.use(logger("combined")); // probar tambien con "dev"
 
 app.use(flash()); // use connect-flash for flash messages stored in session
-
+app.use(cookieParser());
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true

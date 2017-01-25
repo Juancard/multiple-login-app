@@ -42,7 +42,7 @@ module.exports = function (app, appEnv) {
           if (!user) return res.redirect('/login');
           req.logIn(user, function(err) {
             if (err) { return next(err); }
-            return res.redirect('/api/123');
+            return res.redirect('/');
           });
         })(req, res, next);;
       });

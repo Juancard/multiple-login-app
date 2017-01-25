@@ -42,10 +42,7 @@ var User = new Schema({
       displayName: String,
       email: String,
       state: String
-  },
- nbrClicks: {
-    clicks: Number
- }
+  }
 });
 
 // methods ======================
